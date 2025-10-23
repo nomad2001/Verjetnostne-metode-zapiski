@@ -67,17 +67,16 @@ mathescape=true}
 % theorems
 \theoremstyle{definition}
 \newtheorem{counter}{Counter}[section]
-\newtheorem{defn}[counter]{Definicija}
-\newtheorem{lemma}[counter]{Lema}
-\newtheorem{conseq}[counter]{Posledica}
-\newtheorem{claim}[counter]{Trditev}
-\newtheorem{theorem}[counter]{Izrek}
-\newtheorem{pro}[counter]{Dokaz}
+\newtheorem{defn}[counter]{Definition}
+\newtheorem{lemma}[counter]{Lemma}
+\newtheorem{conseq}[counter]{Consequence}
+\newtheorem{claim}[counter]{Claim}
+\newtheorem{theorem}[counter]{Theorem}
+\newtheorem{pro}[counter]{Proof}
 %%
 \theoremstyle{remark}
-\newtheorem*{ex}{Primer}
-\newtheorem*{exmp}{Zgled}
-\newtheorem*{rem}{Opomba}
+\newtheorem*{ex}{Example}
+\newtheorem*{rem}{Remark}
 
 % QED
 \renewcommand\qedsymbol{$\blacksquare$}
@@ -494,7 +493,7 @@ Randomized algorithms:
         \end{cases}$
       \item type(3): $\begin{cases}
           \omega \in \Pi \implies \text{ alg. returns \sn{$\omega \in \Pi$} with probab. } \geq \frac{3}{4} \\ 
-          \omega \notin \Pi \implies \text{ alg. returns \sn{$\omega \in \Pi$} with probab. } \leq \frac{1}{2}
+          \omega \notin \Pi \implies \text{ alg. returns \sn{$\omega \in \Pi$} with probab. } \leq \frac{1}{4}
         \end{cases}$
     \end{itemize}
     type(1) and type(2): one-sided error, type(3): 2-sided error. \\
