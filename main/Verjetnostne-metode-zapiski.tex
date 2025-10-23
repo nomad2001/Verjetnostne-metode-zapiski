@@ -846,23 +846,23 @@ $deg(f[x_1 \dots x_n]) := deg(f[x \dots x])$.
   $n=1$:
   \begin{align*}
     &p(x) = (x-z_1) (x-z_2) \dots (x-z_j) q(z) \\
-    &\text{number of zeros } \leq \text{ degree - fact} \\
-    &P_r(p(r_1) = 0) = \frac{\text{number of zeros}}{|S|} \leq \frac{d}{|S|}.
+    &\text{Fact: number of zeros } \leq \text{ degree} \\
+    &P_r(p(r_1) = 0) = \frac{\text{number of zeros in }S}{|S|} \leq \frac{d}{|S|}.
   \end{align*}
   $n-1 \to n$:
   \begin{align*}
     &\text{rewrite }p: \\
     &p(x_1 \dots x_n) = \sum_{i=0}^{j} x^i p_i(x_2 \dots x_n) \\
-    &j \leq d \\
-    P_r(p(r_1 \dots r_n) = 0) &= P_r(p(r_1 \dots r_n = 0) \mid p_j(r_2 \dots r_n) = 0) \cdot P_r(p_j(r_2 \dots r_n) = 0) \\
-    &+ P_r(p(r_1 \dots r_n = 0) \mid p_j(r_2 \dots r_n) \neq 0) \cdot P_r(p_j(r_2 \dots r_n) \neq 0) \\
+    &\text{for some }j \leq d \\
+    P_r(p(r_1 \dots r_n) = 0) &= P_r(p(r_1 \dots r_n) = 0 \mid p_j(r_2 \dots r_n) = 0) \cdot P_r(p_j(r_2 \dots r_n) = 0) \\
+    &+ P_r(p(r_1 \dots r_n) = 0 \mid p_j(r_2 \dots r_n) \neq 0) \cdot P_r(p_j(r_2 \dots r_n) \neq 0) \\
     &\leq 1 \cdot \frac{d-j}{|S|} + \frac{j}{|S|} \cdot 1 \\
     &= \frac{d}{|S|}, \\
   \end{align*}
   because
   \begin{align*}
-    &P_r(p_j(r_2 \dots r_n) = 0) \leq \frac{d-j}{|S|} \\
-    &P_r(p(r_1 \dots r_n = 0) \mid p_j(r_2 \dots r_n) \neq 0) \leq \frac{j}{|S|}.
+    &P_r(p_j(r_2 \dots r_n) = 0) \leq \frac{d-j}{|S|}\; (\deg(p_j) \leq d - j \text{ because otherwise }\deg(p) > d) \\
+    &P_r(p(r_1 \dots r_n = 0) \mid p_j(r_2 \dots r_n) \neq 0) \leq \frac{j}{|S|}\text{ (WHY???)}.
   \end{align*}
   \qed
 \end{pro}
@@ -878,11 +878,11 @@ Computing $A \cdot B$:
   RAND_ABC(A,B,C):
     for $i$ in range(1,$k+1$):
       $x$ uniformly at random from $\{0,1\}^{n}$
-      if $A \cdot (B \cdot x) \neq x$:
+      if $A \cdot (B \cdot x) \neq C \cdot x$:
         return false
     return true
 \end{lstlisting}
-$O\left(k n^2\right)$. \\
+The time complexity of the above algorithm is $O\left(k n^2\right)$. \\
 
 
 % 5. predavanje: 3.11.
