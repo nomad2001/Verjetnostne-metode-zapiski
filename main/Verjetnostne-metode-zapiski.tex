@@ -80,6 +80,8 @@ mathescape=true}
 
 % QED
 \renewcommand\qedsymbol{$\blacksquare$}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\diam}{diam}
 
 \hypersetup{pdftitle={\ttitle}}
 
@@ -876,7 +878,7 @@ Computing $A \cdot B$:
 \begin{lstlisting}
   RAND_ABC(A,B,C):
     for $i$ in range(1,$k+1$):
-      $x$ uniformly at random from $\{0,1\}^{n}$
+      $x$ uniformly at random from $\{0,1,2\}^{n}$
       if $A \cdot (B \cdot x) \neq C \cdot x$:
         return false
     return true
@@ -895,25 +897,25 @@ If $A \cdot B \neq C$: \\
 $||(AB-C)x||^2$ - polynomial in $x_1 \dots x_n$ of degree $2$. \\
 If $A \cdot B \neq C$, then algorithm return false with probability at least $1 - \left(\frac{2}{3}\right)^k$. \\
 \underline{Problem}: \\
-1-factor in bipartite graphs. \\
+1-factor (perfect matching) in bipartite graphs. \\
 % skica
 $|V(g)| = 2n$. \\
-Represent $G$ with $n \times n$ matrix $Z = (Z_{ij})_{i,j=1}^n$ \\
+Represent $G$ with $n \times n$ matrix $Z = (Z_{ij})_{i,j=1}^n$. Let $X$ be a random $n \times n$ matrix with entries from  $\{1,2,\ldots,2n\}$\\
 $Z_{ij} = \begin{cases}
-  X_{ij}: &\text{ if } a_i b_j \in E(x) \qquad \text{(X: variable)} \\
+  X_{ij}: &\text{ if } a_i b_j \in E(G) \\
   0: &\text{ else}
 \end{cases}$ \\
 \begin{align*}
-  det Z(x_{11} \dots x_{nn}) &= \sum_{\pi \in S_n} sign(\pi) z_{1,\pi(1)} \dots z_{n,\pi(n)} \\
-  &= \sum_{\pi \in S_n, \pi \text{ defines 1-factor}} sign(\pi) x_{1,\pi(1)} \dots x_{n,\pi(n)}.
+  \det Z &= \sum_{\pi \in S_n} \sign(\pi) Z_{1,\pi(1)} \dots Z_{n,\pi(n)} \\
+  &= \sum_{\substack{\pi \in S_n\\ \pi \text{ 1-factor}}} \sign(\pi) X_{1,\pi(1)} \dots X_{n,\pi(n)}.
 \end{align*}
-$det Z \neq 0 \iff G$ has 1-factor.
+$\det Z \neq 0$ for some $X \iff G$ has 1-factor.
 \begin{lstlisting}
   Rand_1factor(G):
-    construct Z with variables $x_{11} \dots x_{nn}$
+    construct polynomial $\det Z$ with variables $x_{11}, \ldots, x_{nn}$
     for $i$ in range(1,$k+1$):
-      $u$ <- uniformly at random from  $\{1,2..2n-1\}^{n^2}$ (r_{11} ... r_{nn}?)
-      compute $d = det Z(r_{11} ... r_{nn})$
+      $r$ <- uniformly at random from  $\{1,2,\ldots,2n\}^{n^2}$
+      compute $d = \det Z(r_{11} ... r_{nn})$
       if $d \neq 0$:
         return true
     return false
@@ -924,7 +926,6 @@ or apply approximation algorithm:
   \item if $G$ has no 1-factor it always returns false,
   \item if $G$ has 1-factor, it returns true with probability at least \\
     $1-\left(\frac{n}{2n}\right)^k = 1 - \left(\frac{1}{2}\right)^k$
-    ($k$ konstant, larger set $\implies$ smaller $k$ needed).
 \end{itemize}
 
 
@@ -946,7 +947,7 @@ $X_{ij} = \begin{cases}
 \end{cases}$ \\
 $p$ can be function of $n$. \\
 $Y_v:$ degree of $v$. \\
-$E(Y_v) = (n-1)p$.
+By observing the handshaking lemma and using linearity of the expected value and the fact that all vertices have the same expected degree, we get $E(Y_v) = (n-1)p$.
 \begin{defn} \text{} \\
   We say that a random graph has some property almost surely (A.S.) if \\
   $P_r(G \in G(n,p) \text{ has property}) \stackrel{n \to \infty}{\longrightarrow} 1$.
@@ -965,7 +966,8 @@ $E(Y_v) = (n-1)p$.
   $P_r(X_w = 1) = p^2$ \\
   $P_r(X_w = 0 \text{ for all } w \neq u,v) = \left(1-p^2\right)^{n-2}$. \\
   \begin{align*}
-    P_r(G \text{ has diameter} > 2) &= P_r(X_w = 0 \text{ for all } w \notin u,v  \text{ for some } u,v) \\
+    P_r(G \text{ has diameter} > 2) &= P_r(X_w = 0 \text{ for all } w \notin u,v  \text{ for some non-adjacent } u,v) \\
+    &\leq P_r(X_w = 0 \text{ for all } w \notin u,v  \text{ for some } u,v) \\
     &\leq \binom{n}{2} (1-p^2)^{n-2} \stackrel{n \to \infty}{\longrightarrow} 0
   \end{align*}
   $\binom{n}{2}$ - polynomial, $e^{\dots}$ - exponent.
@@ -984,49 +986,44 @@ $\frac{1}{n}, \frac{1}{n^3}, \frac{\log n}{n}$
   \end{itemize}
 \end{theorem}
 \begin{theorem} \text{} \\
-  Let $np = \omega(n) \ln(n)$ for $\omega(n) \to \infty$ \sn{very slowly} think of $\omega(n) = \log (\log n)$,
-  then $diam(G)$ in $\Theta\left(\frac{\ln n}{\ln (np)}\right)$ for $G$ in $G(n,p)$.
+  Let $np = \omega(n) \ln(n)$ for $\omega(n) \to \infty$. Then $\diam(G) = \Theta\left(\frac{\ln n}{\ln (np)}\right)$ for $G$ in $G(n,p)$ A. S.
 \end{theorem}
 \begin{lemma} \text{} \\
-  Let $S \subset V(G), |S| = cn$ for $c \in (0,1]$ and $v \notin S$. \\
-  % skica
-  then $cnp(1-\omega^{-\frac{1}{3}}) \leq N_S(v) \leq cnp(1+\omega^{-\frac{1}{3}})$ A.S.
-  ($\omega^{-\frac{1}{3}} \to 0$ very slowly).
+  Let $S \subset V(G), |S| = cn$ for $c \in (0,1]$ and $v \notin S$. Denote by $N_S(v)$ the number of neighbors of $v$ in $S$. Then $cnp(1-\omega^{-\frac{1}{3}}) \leq N_S(v) \leq cnp(1+\omega^{-\frac{1}{3}})$ A.S.
 \end{lemma}
 \begin{pro}(Lemma): \\
-  $E(N_s(v)) = c \cdot n \cdot p, \delta = \omega^{-\frac{1}{3}}$ \\
+  Because each vertex in $S$ is adjacent to $v$ with probability $p$, we have $E(N_s(v)) = c \cdot n \cdot p$. Define $\delta = \omega^{-\frac{1}{3}}$
   \begin{align*}
     P_r(|N_s(v) - cnp| \geq \delta cnp) &\stackrel{\text{Chernoff}}{\leq} 2 e^{-\frac{\omega^{-\frac{2}{3}} cnp}{3}} \\
-    &= 2 e^{-\frac{cnp}{3 \omega(n)^{\frac{2}{3}}}} \stackrel{n \to \infty}{\longrightarrow} 0.
+    &= 2 e^{-\frac{cnp}{3 \omega(n)^{\frac{2}{3}}}} \\
+    &= 2 e^{-\frac{c\omega(n)^{\frac{1}{3}}\ln(n)}{3}}\stackrel{n \to \infty}{\longrightarrow} 0.
   \end{align*}
-  For all $v$: $n \cdot 2 e^{-\frac{cnp}{3 \omega(n)^{\frac{2}{3}}}} \stackrel{n \to \infty}{\longrightarrow} 0$.
+  We can also see that $n \cdot 2 e^{-\frac{cnp}{3 \omega(n)^{\frac{2}{3}}}} \stackrel{n \to \infty}{\longrightarrow} 0$.
   \qed
 \end{pro}
 \begin{pro}(Theorem): \\
-  % skica
-  $k$ be such that $\sum_{i=0}^{k-1} |N_i| \leq \frac{n}{2}, \sum_{i=0}^{k} |N_i| > \frac{n}{2}$. \\
+  Let $G$ be a random graph and let $v$ be any vertex in $G$. Let $N_i$ be the random variable which maps to the set of all vertices in $G$ whose distance from $v$ is equal to $i$.\\
   $|N_0| = 1$ \\
-  $|N_i| \leq |N_{i-1}| \cdot n \cdot p \cdot (1+\omega^{-\frac{1}{3}})$: \\
-  $|S| \leq n, \; np(1+\omega^{-\frac{1}{3}})$-each element. \\
-  $k \stackrel{?}{=}
-  \frac{\log \left(\frac{n}{3}\right)}{\log \left(n \cdot p \cdot \left(1+\omega^{-\frac{1}{3}}\right)\right)}
+  Every vertex that is at distance $i$ from $v$, is a neighbor of a vertex in $N_{i-1}$ which isn't contained in $N_j$ for $j < i$. So $N_i$ is a subset of the set of neighbors of $N_{i-1}$ which aren't contained in $N_j$ for $j < i$. 
+  By the previous lemma, every vertex in $N_{i-1}$ has at most $n \cdot p \cdot (1+\omega^{-\frac{1}{3}})$ neighbors which aren't contained in such $N_j$ A. S. Because the sets of neighbors of different vertices in $N_i$ are independent variables, we have 
+  that previously described set of neigbhors of vertices in $N_{i-1}$ has at most $|N_{i-1}| \cdot n \cdot p \cdot (1+\omega^{-\frac{1}{3}})$ vertices A. S. and so $|N_i| \leq |N_{i-1}| \cdot n \cdot p \cdot (1+\omega^{-\frac{1}{3}})$ A. S. \\
+  Let's select $k = \frac{\log \left(\frac{n}{3}\right)}{\log \left(n \cdot p \cdot \left(1+\omega^{-\frac{1}{3}}\right)\right)}
   = \log_{np(1+\omega^{-\frac{1}{3}})} \frac{n}{3} = \Theta\left(\frac{\ln(n)}{\ln(np)}\right)$. \\
-  $|N_{\leq k}| = |N_1 \cup \dots \cup N_k|$.
+  $N_{\leq k} = N_1 \cup \dots \cup N_k$. We then have almost surely:
   \begin{align*}
     |N_{\leq k}| &\leq \sum_{i=0}^{k} (np(1+\omega^{-\frac{1}{3}}))^i \\
     &= \frac{(np(1+\omega^{-\frac{1}{3}}))^{k+1}-1}{np(1+\omega^{-\frac{1}{3}}) - 1} \\
     &< \frac{np(1+\omega^{-\frac{1}{3}})^{k+1}}{\frac{1}{2} np(1+\omega^{-\frac{1}{3}})} \\
     &= 2 np(1+\omega^{-\frac{1}{3}})^k \\
     &\stackrel{k}{=} 2 \cdot \frac{n}{3} \text{ - haven't covered all} \\
-    &\implies diam(G) > k \text{ bound from below}.
+    &\implies \diam(G) > k \text{ bound from below}.
   \end{align*}
 
 
 % 6. predavanje: 10.11.
 
-  % skica
-  $N_i \subseteq S$ \\
-  $\frac{1}{2} n p \left(1-\omega^{-\frac{1}{3}}\right) \cdot |N_{i-1}| \leq |N_i|$ \\
+  Now let $k$ be such that $\sum_{i=0}^{k-1} |N_i| \leq \frac{n}{2}, \sum_{i=0}^{k} |N_i| > \frac{n}{2}$. \\
+  By the selection of $k$ and by selecting $S$ = $V(G) \setminus N_{\leq i}$, we have $|S| \geq \frac{n}{2}$ and so by previous lemma we have $\frac{1}{2} n p \left(1-\omega^{-\frac{1}{3}}\right) \cdot |N_{i-1}| \leq |N_i|$ A. S. Thus we have almost surely:
   \begin{align*}
     n & \geq \sum_{i=0}^{k} |N_i| \\
     & \geq \sum_{i=0}^{k} \left(\frac{1}{2} n p \left(1-\omega^{-\frac{1}{3}}\right)\right)^i \\
@@ -1034,11 +1031,11 @@ $\frac{1}{n}, \frac{1}{n^3}, \frac{\log n}{n}$
       {\frac{1}{2} n p \left(1-\omega^{-\frac{1}{3}}\right) - 1} \\
     &\geq \left(\frac{1}{2} n p \left(1-\omega^{-\frac{1}{3}}\right)\right)^k \qquad / \ln
   \end{align*}
-  $\frac{\ln n}{\ln (np)} \approx \frac{\ln n}{\ln \left(\frac{1}{2} n p \left(1-\omega^{-\frac{1}{3}}\right)\right)} \geq k$. \\
+  Which gives us $\frac{\ln n}{\ln (np)} \approx \frac{\ln n}{\ln \left(\frac{1}{2} n p \left(1-\omega^{-\frac{1}{3}}\right)\right)} \geq k$. \\
   $\implies w \in S^{'}$. \\
   Number of neighbors in $N_k$ A.S. $\geq 1$, \\
   $|N_k| \geq \left(\frac{1}{2} n p \left(1-\omega^{-\frac{1}{3}}\right)\right)^k \approx c \cdot n$ \\
-  $\implies diam (G) = k + 1 $ A.S.
+  $\implies \diam (G) = k + 1 $ A.S. (WHY?????)
   \qed
 \end{pro}
 
