@@ -1041,13 +1041,10 @@ $\frac{1}{n}, \frac{1}{n^3}, \frac{\log n}{n}$
 
 \subsection{Scale free property}
 
-$G \in G(n,p)$. \\
-% skica
-In real world:
-% skica, skica
-$p(k) = $ proportion of degree $k$ vertices. \\
-$\log(p(k)) = -\gamma \cdot \log k$ \\
-$p(k) = k^{-\gamma}$. \\
+Suppose $G$ is a random graph on $n$ vertices in the most general way - the set of edges is a random variable with any distribution. Let $p_n(k)$ be the random
+variable denoting the expected proportion of vertices of degree $k$. Suppose $p(k) = \lim_{n\to \infty}p_n(k)$ exists for every $k$. Then we say that the distribution has the scale-free property if 
+$$\lim_{k\to \infty}p(k)k^{\gamma} = C$$
+for some constants $\gamma$ and $C$, that is $p(k) \sim k^{-\gamma}$ or $\log(p(k)) \sim -\gamma \cdot \log k$.\\
 Internet: $\gamma \approx 3.42$, \\
 protein reactions: $\gamma \approx 2.89$.
 
@@ -1055,7 +1052,7 @@ protein reactions: $\gamma \approx 2.89$.
 \section{Barbási-Albert Model}
 
 B.A. model. \\
-Start with $m$ modes. \\
+Start with $m$ nodes. \\
 Grow:
 \begin{itemize}
   \item add node $v$,
