@@ -1123,7 +1123,7 @@ $\Omega$: finite set (of states).
 \end{ex}
 \begin{defn}[Transition matrix] \text{} \\
   $\Omega = \{x_1 \dots x_n\}$ \\
-  $p_{ij} = P(X_{t+1} = j \mid X_t = i)$ \\
+  $p_{ij} = P(X_{t+1} = x_j \mid X_t = x_i)$ \\
   $\begin{bmatrix}
     p_{11} & \dots \\ p_{1n} \\
     \vdots & & \vdots \\
@@ -1160,10 +1160,10 @@ $\vdots$ \\
     \item Distribution $\pi$ is stationary if $\pi = \pi \cdot P$,
     \item $f_{ij}$: probability that $X_t = x_j$ for some $t$ assuming $X_0 = x_i$,
       % skica
-    \item $h_{ij}$: expected number of steps needed to get to state $X_j$ strting in $X_i$ (hitting time),
+    \item $h_{ij}$: expected number of steps needed to get to state $x_j$ starting in $x_i$ (hitting time),
     \item $N(i, t, q(0))$: expected number of times we visit $x_i$ after $t$ steps starting with distribution $q(0)$,
     \item $\forall f_{ij} > 0 \; \iff$ transition graph is strongly connected $\iff$ we say the chain is irreducible,
-    \item M.C. is aperiodic if there is no $c \in \{2, 3, 4 \dots\}$ such that all lengths of cycles are divisible by $c$.
+    \item M.C. is aperiodic if there is no $c \in \{2, 3, 4 \dots\}$ such that all lengths of cycles in the transition graph are divisible by $c$.
   \end{itemize}
 \end{defn}
 \begin{theorem} \text{} \\
