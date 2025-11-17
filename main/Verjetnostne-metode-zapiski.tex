@@ -1049,45 +1049,55 @@ Internet: $\gamma \approx 3.42$, \\
 protein reactions: $\gamma \approx 2.89$.
 
 
-\section{Barbási-Albert Model}
+\section{Barabási-Albert Model}
 
 B.A. model. \\
 Start with $m$ nodes. \\
 Grow:
 \begin{itemize}
   \item add node $v$,
-  \item add $m$ edges from $v$ (to $u$),
-  \item for each new edge: $P(v \sim u) = \frac{deg u}{\sum_x deg x}$.
+  \item add $m$ edges from $v$ (to $u$) in such way that $P(v \sim u) = \frac{\deg(u)}{\sum_x \deg(x)}$.
 \end{itemize}
+
+The selection of new neighbors can be done in such way that we uniformly at random select one of the existing edges and the uniformly at random select one of its vertices.
+
 \begin{theorem} \text{} \\
   B.A. model has scale free property, in particular \\
   $p_k = \frac{2 m (m+1)}{k (k+1) (k+2)}$.
 \end{theorem}
 \begin{defn} \text{} \\
-  $p_n(k)$: expected proportion of degree $k$ vertices in graph with $k$ vertices, \\
+  $p_n(k)$: expected proportion of degree $k$ vertices in graph with $n$ vertices, \\
   $p_k := \lim_{n \to \infty} p_n(k)$.
 \end{defn}
 \begin{pro} \text{} \\
   $p_n(k) \cdot n$: expected number of degree $k$ vertices, \\
-  $p_n(k) n \cdot \frac{k}{\sum_u deg u} m = p_n(k) \cdot \frac{k}{2}$:
-    expected number of degree $k$ vertices changing into degree $k+1$ vertices. \\
-  $\sum_u deg u = 2 |E|$ \\
-  $p_{n+1}(k) \cdot (n+1) = p_n(k) \cdot n - p_n(k) \cdot \frac{k}{2} + p_n(k-1) \cdot \frac{k-1}{2}$, where \\
+  Let $X_k$ be the number of vertices with degree $k$ when we have $n$ vertices and let $Y_k$ be the number of vertices who had degree $k$ at $n$ vertices and degree $k + 1$ at $n + 1$ vertices.
+  By the law of total expected value we have 
+  \begin{align*}
+    E[Y_k] = E[Y_k | X_k = 0]&P(X_k = 0) + E[Y_k | X_k = 1]P(X_k = 1)\\ &+ \ldots + E[Y_k | X_k = n]P(X_k = n)  
+  \end{align*}
+  Under the assumption that $X_k = l$, we have $Y_k = I_1 + \ldots + I_l$ where $I_a = 1$ if the $a$-th vertex with degree $k$ is selected as the neighbor of the new vertex and $0$ otherwise.
+  Then $$E[Y_k | X_k = l] = l \cdot E[I_a] = l \cdot P(I_a = 1) = l \cdot \frac{k}{\sum_u \deg(u)}.$$
+  Plugging that into the equation for total expected value, we get 
+  $$E[Y_k] = E[X_k]\frac{k}{\sum_u \deg(u)} = p_n(k) \cdot n \cdot \frac{k}{\sum_u \deg(u)} \cdot m.$$
+  By the handshaking lemma we have $\sum_u \deg(u) = 2 |E| = 2m(n - m)$ (assuming we start with $m$ independent vertices) and so
+  $$E[Y_k] = p_n(k)\frac{nk}{2(n - m)}.$$
+  $p_{n+1}(k) \cdot (n+1) = p_n(k) \cdot n - p_n(k) \cdot \frac{nk}{2(n - m)} + p_n(k-1) \cdot \frac{n(k-1)}{2(n - m)}$, where \\
   $p_n(k) \cdot n$: degree $k \to k$, \\
-  $p_n(k) \cdot \frac{k}{2}: k \to k+1$, \\
-  $p_n(k-1) \cdot \frac{k-1}{2}: k-1 \to k$. \\
-  For $n$ very big (very close to limit): \\
-  $p_k \cdot (n+1) = p_k \cdot n - p_{k-1} \cdot \frac{k}{2} + p_{k-1} \cdot \frac{k-1}{2}$ \\
-  $\implies p_k = \frac{k-1}{k+2} p_{k-1}$. \\
+  $p_n(k) \cdot \frac{nk}{2(n - m)}: k \to k+1$, \\
+  $p_n(k-1) \cdot \frac{n(k-1)}{2(n - m)}: k-1\text{ or less} \to k$ (for $k > m$; for $k = m$ this summand is equal to $1$ because we add a vertex who had degree zero and now has degree $1$). \\
+  Assuming without proof that $\lim_{n\to \infty}(p_{n+1}(k) - p_n(k))n = 0$ when sending $n \to \infty$ we get: \\
+  $p_k = -p_{k-1} \cdot \frac{k}{2} + p_{k-1} \cdot \frac{k-1}{2} = \frac{k-1}{k+2} p_{k-1}$. \\
   For degree $m$: \\
-  $(n+1) \cdot p_{n+1}(m) = p_n(m) \cdot n - p_n(m) \cdot \frac{m}{2} + 1$ \\%??
-  $(n+1) \cdot p_m = n \cdot p_m - \frac{m}{2} \cdot p_m + 1$
+  $(n+1) \cdot p_{n+1}(m) = p_n(m) \cdot n - p_n(m) \cdot \frac{nm}{2(n - m)} + 1$ \\
+  Similarly to before, by sending $n \to \infty$ we get $p_m = -\frac{m}{2} \cdot p_m + 1$ and so:
   \begin{align*}
     &p_m = \frac{2}{m+2} \\
     \implies &p_{m+1} = \frac{2}{m+2} \cdot \frac{m}{m+3} \\
-    \implies &p_{m+2} = \frac{2m(m+1)}{(m+2)(m+3)} \\
-    \implies &p_k = \frac{2m(m+1)}{k(k+1)(k+2)}.
+    \implies &p_{m+2} = \frac{2m(m+1)}{(m+2)(m+3)}.
   \end{align*}
+  Using induction we get
+  $$p_k = \frac{2m(m+1)}{k(k+1)(k+2)}.$$
   \qed
 \end{pro}
 
