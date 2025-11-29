@@ -82,6 +82,7 @@ mathescape=true}
 \renewcommand\qedsymbol{$\blacksquare$}
 \DeclareMathOperator{\sign}{sign}
 \DeclareMathOperator{\diam}{diam}
+\DeclareMathOperator{\val}{val}
 
 \hypersetup{pdftitle={\ttitle}}
 
@@ -1125,7 +1126,7 @@ $\Omega$: finite set (of states).
   $\Omega = \{x_1 \dots x_n\}$ \\
   $p_{ij} = P(X_{t+1} = x_j \mid X_t = x_i)$ \\
   $\begin{bmatrix}
-    p_{11} & \dots \\ p_{1n} \\
+    p_{11} & \dots & p_{1n} \\
     \vdots & & \vdots \\
     p_{n1} & \dots & p_{nn}
   \end{bmatrix}$.
@@ -1222,92 +1223,105 @@ Recall: k-SAT:
 \end{theorem}
 \begin{pro} \text{} \\
   Let $a = (a_1 \dots a_n)$ be a correct solution. \\
-  Let $X_i =$ Hamming distance from $b^i$ to $a$. \\
-  % skica(i)
-  Goal: bound $h_{n,0}$. \\
-  $P(\text{distance of } b^{i+1} \text{ to $a$ is } j-1 \mid \text{distance of $b^i$ to $a$ is } j) \geq \frac{1}{2}$. \\
-  $P = \begin{bmatrix}
-    0 & 1 & \dots & 0 \\
-    \frac{1}{2} & 0 & \dots & 0 \\
-    \vdots & & & \vdots \\
-    \dots & & 1 & 0
-  \end{bmatrix}$ \\
-  $\pi \stackrel{?}{=} \pi P$ \\
-  $\pi = (\frac{1}{2n}, \frac{1}{n} \dots \frac{1}{n}, \frac{1}{2n})$ \\
-  By theorem \\
-  $h_{i,i} = \frac{1}{\pi_i} = n$ for $i = 1, 2 \dots n-1$ \\
-  $h_{0,0} = h_{n,n} = 2n$ \\
-  $n = h_{i,i} = 1 + \frac{1}{2} h_{i+1,i} + \frac{1}{2} h_{i-1,i}$ \\
-  $h_{i+1,i} \leq 2n$ \\
-  $i = 0: \; 2n = h_{0,0} = 1 + h_{1,0} \implies h_{1,0} < 2n$ \\
-  $h_{n,0} \leq h_{n,n-1} + \dots + h_{1,0} \leq 2n^2$ \\
-  $E(\text{steps in algorithm to reach correct solution}) = E(Z) \leq 2n^2$ \\
-  $P(\text{algorithm hasn't reached correct solution after $8n^2$ steps}) \\
-  = P(Z > 8n^2) \stackrel{\text{Markov}}{\leq} \frac{E(Z)}{8n^2} \leq \frac{1}{4}$.
+  Say we are at $i$-th step and we have selected $C_l = l_1 \vee l_2$ that is false where $l_1$ and $l_2$ are functions of $x_{l1}$ and $x_{l2}$. Let $\val(x_{l1})$ and $\val(x_{l2})$ be the values
+  of $x_{l1}$ and $x_{l2}$ for which $l_1$ and $l_2$ are true. Then we must have $a_{l1} = \val(x_{l1})$ or $a_{l2} = \val(x_{l2})$
+  because $C_l$ has to be true when evaluated in $a$. And because $C_l$ is false when evaluated in $b^i$ is false, then we must have both $b^i_{l1} \neq \val(x_{l1})$ and $b^i_{l2} \neq \val(x_{l2})$.
+  This means that either $b^{i+1}_{l1} = \val(x_{l1})$ or $b^{i+1}_{l2} = \val(x_{l2})$. All of this together gives us for $ j \geq 1$
+  $$P(\text{distance of } b^{i+1} \text{ to $a$ is } j-1 \mid \text{distance of $b^i$ to $a$ is } j) \geq \frac{1}{2}.$$
+
+  We define an auxiliary Markov chain
+  $$P = \begin{bmatrix}
+    0 & 1 & 0 & 0 & \dots & \dots & 0 \\
+    \frac{1}{2} & 0 & \frac{1}{2} & 0 & \dots & \dots & 0 \\
+    0 & \frac{1}{2} & 0 & \frac{1}{2} & \dots & \dots & 0 \\
+    \vdots & & & & & & \vdots \\
+    0 & 0 & \dots & \dots & \frac{1}{2} & 0 & \frac{1}{2} \\
+    0 & \dots & \dots & 0 & 0 & 1 & 0
+  \end{bmatrix}.$$
+  This is a finite irreducible Markov chain and so by theorem it has a unique stationary distribution
+  $$\pi = (\frac{1}{2n}, \frac{1}{n} \dots \frac{1}{n}, \frac{1}{2n}).$$
+  By theorem we know that $h_{i,i} = \frac{1}{\pi_i} = n$ for $i = 1, 2 \dots n-1$ and $h_{0,0} = h_{n,n} = 2n$. \\
+  We also know that for every $i \in \{1, \ldots, n-1\}$ we have $n = h_{i,i} = 1 + \frac{1}{2} h_{i+1,i} + \frac{1}{2} h_{i-1,i}$. For every
+  $i \in \{2, \ldots, n-2\}$ we have $h_{i+1,i} = h_{i-1,i}$ and so $h_{i+1,i} = n - 1$. We know that $h_{n, n - 1} = 1$ and $2n = h_{0,0} = 1 + h_{1,0}$,
+  so $h_{1,0} = 2n - 1$. Thus for every $i \leq n - 1$ we have $h_{i+1,i} \leq 2n$ and so
+  $$h_{n,0} \leq h_{n,n-1} + \dots + h_{1,0} \leq 2n^2.$$
+  We could show that because
+  $$P(\text{distance of } b^{i+1} \text{ to $a$ is } j-1 \mid \text{distance of $b^i$ to $a$ is } j) \geq \frac{1}{2},$$
+  the expected number of steps to reduce the Hamming distance from $n$ to $0$ is less than $h_{n,0}$. This proves that
+  $$E(\text{steps in algorithm to reach correct solution}) = E(Z) \leq 2n^2$$
+  and so
+  \begin{align*}
+    P(\text{algorithm }&\text{hasn't reached correct solution after $8n^2$ steps}) \\&= P(Z > 8n^2) \stackrel{\text{Markov}}{\leq} \frac{E(Z)}{8n^2} \leq \frac{1}{4}.
+  \end{align*}  
   \qed
 \end{pro}
 
 
 \section{Generating a uniformly random element of a set}
 
-$\Omega$: set. \\
-Let $G$ be a symmetric graph on $\Omega$. \\
-We form M.C: \\
-$P_{x,y} = \begin{cases}
+Suppose we have a set $\Omega$ from which we want to sample uniformly. If the set is small, we can just explicitly list all elements
+and select one at random. But if we have a very large set we can't do that. Here we develop an approach to an approximation of 
+uniform sampling in such large sets.
+
+Let $\Omega$ be a set and let $G$ be a undirected graph with vertices on $\Omega$. We form M. C: 
+$$P_{x,y} = \begin{cases}
   \frac{1}{M}: &\text{ if } x \neq y \land x \sim y \\
   0: &\text{ if } x \neq y \land x \nsim y \\
   1 - \frac{|N(x)|}{M}: &\text{ if } x = y
-\end{cases}$ \\
-$M \geq \max_{v \in \Omega} |N(v)|$. \\
-If $G$ is connected $\implies$ M.C. is irrecudible. \\
-$\pi = (\frac{1}{|\Omega|} \dots \frac{1}{|\Omega|})$ \\
-$\pi \stackrel{?}{=} \pi P$ \\
+\end{cases}$$
+where we choose some $M \geq \max_{v \in \Omega} |N(v)|$. \\
+If $G$ is connected, then M.C. is irrecudible. \\
+Let's prove that $\pi = (\frac{1}{|\Omega|} \dots \frac{1}{|\Omega|})$ is a stationary distribution of $P$.
 \begin{align*}
   (\pi P)_x &= \sum_y \pi_y P_{y,x} \\
   &= \sum_{y \in N(x)} \frac{1}{M} \cdot \frac{1}{|\Omega|} + \frac{1}{|\Omega|}
     \left(1 - \frac{|N(x)|}{M}\right) = \frac{1}{|\Omega|} = \pi_x.
 \end{align*}
-$\implies$ if we walk on the Markov chain long enough, we end up in state $x$ with probability $\pi_x = \frac{1}{|\Omega|}$ \\
-$\implies$ we can sample uniformly.
+This means that if we walk on the Markov chain long enough, we end up in state $x$ with probability approximately $\pi_x = \frac{1}{|\Omega|}$.
+This gives us an approximation of uniform sampling.
 \begin{ex} \text{} \\
-  $G$ graph, finding largest independent set $(\forall u,v: u \nsim v)$ is NP-complete. \\
-  Lets try sampling a uniformly random independent set \\
-  $\Omega = \{\text{independent sets}\}$ \\
-  $u \sim v$ if $|u \triangle v| = 1$ $((u \cup \{el\}) = v)$ \\
-  M.C.: $X_0$ = arbitrary independent set \\
-  $X_{i+1}$:
+  Let $G = (V, E)$ be a graph, finding largest independent set $(\forall u,v: u \nsim v)$ is NP-complete. Let's try sampling a uniformly random independent set-
+  Let $\Omega = \{\text{independent sets}\}$ and let $\Gamma$ be a graph with $\Omega$ for vertices where to independent sets are connected
+  if they differ by exactly one vertex. Graph $\Gamma$ is obviously connected because for every independent sets $A$ and $B$ we have a walk where we
+  delete vertex by vertex from $A$ and then add vertex by vertex from $B$. We define a random walk on $\Gamma$ as follows:\\
+  Let $X_0$ be an arbitrary independent set. Suppose we have $X_i = U$. Then we form $X_{i+1}$ as follows:
   \begin{itemize}
     \item pick uniformly at random $v \in V(G)$,
     \item if $v \in U$ then $X_{i+1} = U \textbackslash \{v\}$,
     \item if $U \cup \{v\}$ is independent then $X_{i+1} = U \cup \{v\}$,
     \item else $X_{i+1} = U$.
   \end{itemize}
-  $M$ is number of vertices \\
-  $\implies \; \forall u \in \Omega: \lim_{t \to \infty} P(X_t = u) = \frac{1}{|\Omega|}$. \\
-  Note: irredudicle; $U \to \emptyset \to V$, aperiodic.
+  In $\Gamma$ independent set $U$ is adjacent only to vertices of form to $U \cup \{v\}$ and $U \textbackslash \{v\}$. The walk will go from $U$
+  to one of these neighbors only if we select $v$. Because we select a vertex at random, the probability of that happening is $\frac{1}{|V|}$.
+  The process will never go from $U$ to any independent set not adjacent to $U$ and the probability of the process staying at $U$ is precisely
+  $1 - \frac{N(U)}{|V|}$. Thus if we select $M = |V|$, this walk is precisely the Markov chain $P$ we defined above, meaning for every $U \in \Omega$
+  we have
+  $$\lim_{t \to \infty} P(X_t = u) = \frac{1}{|\Omega|}$$
+  which gives us an approximation of uniform sampling of independent sets.
 \end{ex}
 
 
 \section{Metropolis algorithm}
 
-$\Omega$: set, \\
-$\pi$: chosen distribution on $\Omega$. \\
-Make $G$ graph on $\Omega$ \\
-$P_{x,y} = \begin{cases}
+Suppose we have a set $\Omega$ and we want to sample elements with a chosen distribution $\pi$ from $\Omega$. We do so by constructing 
+a connected graph $G$ with vertices on $\Omega$ and defining a random walk on this graph which corresponds to an irreducible Markov chain
+with stationary distribution $\pi$. Then by walking around $G$ for long enough time, we get an approximation of sampling with distribution $\pi$.
+Let's define the following Markov chain:
+$$P_{x,y} = \begin{cases}
   \frac{1}{M} \cdot \min \left(1, \frac{\pi_y}{\pi_x}\right): &\text{ if } x \neq y \land x \sim y \\
   0: &\text{ if } x \neq y \land x \nsim y \\
-  1 - \sum_{y \in N(x)}: &\text{ if } x = y
-\end{cases}$ \\
-$M \geq \max_{v \in \Omega} |N(v)|$ \\
-$\pi \stackrel{?}{=} \pi P$
+  1 - \sum_{z \in N(x)}\frac{1}{M} \cdot \min \left(1, \frac{\pi_z}{\pi_x}\right): &\text{ if } x = y
+\end{cases}$$
+where we choose some $M \geq \max_{v \in \Omega} |N(v)|$. Now let's prove that $\pi$ is indeed the stationary distribution of this irreducible
+Markov chain:
 \begin{align*}
   (\pi P)_x &= \sum_y \pi_y P_{y,x} =
-    \sum_{y \in N(x)} \pi_y \frac{1}{M} \min \left(\left(1, \frac{\pi_y}{\pi_x}\right)\right)
+    \sum_{y \in N(x)} \pi_y \frac{1}{M} \min \left(\left(1, \frac{\pi_x}{\pi_y}\right)\right)
     + \pi_x \left(1 - \sum_{y \in N(x)} \frac{1}{M} \min \left(1, \frac{\pi_y}{\pi_x}\right)\right) \\
-  &= \sum_{y \in N(x), \pi_y \geq \pi_x} \pi_y \frac{1}{M} \cdot 1 +
-    \sum_{y \in N(x), \pi_y < \pi_x} \pi_y \frac{1}{M} \frac{\pi_y}{\pi_x} + \pi_x \\
-  &- \sum_{y \in N(x), \pi_y \geq \pi_x} \pi_x \frac{1}{M} \frac{\pi_y}{\pi_x} -
-    \sum_{y \in N(x), \pi_y < \pi_x} \frac{1}{M} \cdot 1 \\
+  &= \sum_{y \in N(x), \pi_y < \pi_x} \pi_y \frac{1}{M} \cdot 1 +
+    \sum_{y \in N(x), \pi_y \geq \pi_x} \pi_y \frac{1}{M} \frac{\pi_x}{\pi_y} + \pi_x \\
+  &- \sum_{y \in N(x), \pi_y < \pi_x} \pi_x \frac{1}{M} \frac{\pi_y}{\pi_x} -
+    \sum_{y \in N(x), \pi_y \geq \pi_x} \pi_x \frac{1}{M} \cdot 1 \\
   &= \pi_x.
 \end{align*}
 \begin{ex} \text{} \\
@@ -1317,7 +1331,7 @@ $\pi \stackrel{?}{=} \pi P$
   \begin{lstlisting}
     $X_0$ arbitrary
     for $i$ = in range(1,$m$):
-      $y$ <- uniformly from $\{X_i-11,X_i+1\}$
+      $y$ <- uniformly from $\{X_i-1,X_i+1\}$
       $M$ <- uniformly from $[0,1]$
       if $M \leq \frac{\pi(y)}{\pi(x)}$:
         $X_{i+1} = y$
